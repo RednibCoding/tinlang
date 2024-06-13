@@ -490,7 +490,7 @@ func (vm *TinVM) handleCustomFunction(ident string, active bool) bool {
 		if active {
 			err := fn(args)
 			if err != nil {
-				vm.error(fmt.Sprintf("error in custom function '%s': %v", ident, err))
+				vm.error(fmt.Sprintf("error in function '%s': %v", ident, err))
 			}
 		}
 		return true
