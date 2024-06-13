@@ -10,7 +10,7 @@ func main() {
 	// args := os.Args
 	args := []string{"tin.exe", "test.tin"}
 	if len(args) < 2 {
-		fmt.Println("USAGE: int <sourcefile>")
+		fmt.Println("USAGE: tin <sourcefile>")
 		os.Exit(1)
 	}
 	source, err := os.ReadFile(args[1])
