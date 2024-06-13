@@ -3,7 +3,7 @@
 ; the import statement with the content of the file
 ; so no namespacing or double import check
 ; in tin it is ideomatic to have a main.tin that import everything once
-#import "bye"
+#import bye
 
 def demo {
     a = "math expressions "

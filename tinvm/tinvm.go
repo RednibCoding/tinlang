@@ -432,10 +432,11 @@ func (vm *TinVM) preprocess(source string) (string, error) {
 	scanner := bufio.NewScanner(strings.NewReader(source))
 
 	for scanner.Scan() {
-		line := scanner.Text()
+		lineRaw := scanner.Text()
+		line := strings.TrimSpace(lineRaw)
 		if strings.HasPrefix(line, "#import ") {
 			// Extract the file path from the import statement
-			importPath := strings.TrimSpace(line[len(";import "):])
+			importPath := strings.TrimSpace(line[len("#import "):])
 			importPath = strings.Trim(importPath, "\"") + ".tin"
 
 			// Read the content of the file
