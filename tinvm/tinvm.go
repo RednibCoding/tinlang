@@ -9,18 +9,24 @@ import (
 )
 
 type TinVM struct {
-	source     string
-	pc         int
-	variables  map[string]interface{}
-	returnFlag bool
+	source      string
+	pc          int
+	variables   map[string]interface{}
+	customFuncs map[string]func([]interface{}) error
+	returnFlag  bool
 }
 
 func New() *TinVM {
-	return &TinVM{
-		pc:         0,
-		variables:  make(map[string]interface{}),
-		returnFlag: false,
+	vm := &TinVM{
+		pc:          0,
+		variables:   make(map[string]interface{}),
+		customFuncs: make(map[string]func([]interface{}) error),
+		returnFlag:  false,
 	}
+
+	vm.AddFunction("print", customPrintFunction)
+
+	return vm
 }
 
 func (vm *TinVM) Run(source string) {
@@ -36,6 +42,14 @@ func (vm *TinVM) Run(source string) {
 	for vm.nextChar() != '\000' {
 		vm.block(active)
 	}
+}
+
+func (vm *TinVM) AddFunction(name string, fn func([]interface{}) error) {
+	vm.customFuncs[name] = fn
+}
+
+func (vm *TinVM) AddVariable(name string, value interface{}) {
+	vm.variables[name] = value
 }
 
 func (vm *TinVM) look() byte {
@@ -374,18 +388,6 @@ func (vm *TinVM) doBreak(active bool) {
 	}
 }
 
-func (vm *TinVM) doPrint(active bool) {
-	for {
-		e := vm.expression(active)
-		if active {
-			fmt.Print(e.value)
-		}
-		if !vm.takeNext(',') {
-			return
-		}
-	}
-}
-
 func (vm *TinVM) doReturn(active bool) {
 	if active {
 		vm.returnFlag = true
@@ -393,6 +395,18 @@ func (vm *TinVM) doReturn(active bool) {
 }
 
 func (vm *TinVM) statement(active bool) {
+	ident := vm.takeNextAlnum()
+	if ident == "" {
+		vm.error("unknown statement")
+	}
+
+	// Check if the statement is a custom function
+	if vm.handleCustomFunction(ident, active) {
+		return
+	}
+
+	// Reset pc to allow normal statement parsing if not a custom function
+	vm.pc -= len(ident)
 	switch {
 	case vm.takeString("if"):
 		vm.doIfElse(active)
@@ -406,8 +420,6 @@ func (vm *TinVM) statement(active bool) {
 		vm.doDefDecl()
 	case vm.takeString("return"):
 		vm.doReturn(active)
-	case vm.takeString("print"):
-		vm.doPrint(active)
 	default:
 		vm.doAssign(active)
 	}
@@ -469,4 +481,56 @@ func (vm *TinVM) error(text string) {
 	}
 	fmt.Printf("\nERROR %s in line %d: '%s_%s'\n", text, strings.Count(vm.source[:vm.pc], "\n")+1, vm.source[s:vm.pc], vm.source[vm.pc:e])
 	os.Exit(1)
+}
+
+func (vm *TinVM) handleCustomFunction(ident string, active bool) bool {
+	if fn, ok := vm.customFuncs[ident]; ok {
+		// Collect arguments for the custom function without parentheses
+		args := vm.collectArgs(active)
+		if active {
+			err := fn(args)
+			if err != nil {
+				vm.error(fmt.Sprintf("error in custom function '%s': %v", ident, err))
+			}
+		}
+		return true
+	}
+	return false
+}
+
+func (vm *TinVM) collectArgs(active bool) []interface{} {
+	var args []interface{}
+	for vm.nextChar() != '\n' && vm.nextChar() != '\000' {
+		e := vm.expression(active)
+		if active {
+			args = append(args, e.value)
+		}
+		if vm.nextChar() == ',' {
+			vm.take()
+		} else {
+			break
+		}
+	}
+	return args
+}
+
+// #################################################################
+//
+//	Custom Functions
+//
+// #################################################################
+func customPrintFunction(args []interface{}) error {
+	for _, arg := range args {
+		switch v := arg.(type) {
+		case string:
+			fmt.Print(v)
+		case int:
+			fmt.Print(v)
+		case float64:
+			fmt.Print(v)
+		default:
+			return fmt.Errorf("unsupported argument type")
+		}
+	}
+	return nil
 }
