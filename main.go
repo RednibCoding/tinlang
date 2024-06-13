@@ -7,8 +7,8 @@ import (
 )
 
 func main() {
-	// args := os.Args
-	args := []string{"tin.exe", "test.tin"}
+	// args := []string{"tin.exe", "test.tin"}
+	args := os.Args
 	if len(args) < 2 {
 		fmt.Println("USAGE: tin <sourcefile>")
 		os.Exit(1)
