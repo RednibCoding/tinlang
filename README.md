@@ -2,6 +2,7 @@
 # TinVM: A Tiny Scripting Language
 
 TinVM is a tiny interpreter for the custom scripting language "tin".
+Tin is basically one step above the BASIC language.
 
 ## Building the Project
 
