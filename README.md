@@ -406,6 +406,6 @@ if "" {
 - **Example**: `print: "Hello, World times ", 10"`
 
 ### wait
-- **Syntax**: `print <milliseconds>`
+- **Syntax**: `wait <milliseconds>`
 - **Description**: Waits the given amout of milliseconds
 - **Example**: `wait 2000`
