@@ -587,7 +587,17 @@ func (vm *TinVM) collectArgs(active bool) []interface{} {
 	for vm.nextChar() != '\n' && vm.nextChar() != '\000' {
 		e := vm.expression(active)
 		if active {
-			args = append(args, e.value)
+			// check type and append the correct type (string, int or float64)
+			switch e.typ {
+			case 's':
+				args = append(args, e.value.(string))
+			case 'i':
+				args = append(args, e.value.(int))
+			case 'f':
+				args = append(args, e.value.(float64))
+			default:
+				panic("Unknown type in collectArgs: this should never happen!")
+			}
 		}
 		if vm.nextChar() == ',' {
 			vm.take()
