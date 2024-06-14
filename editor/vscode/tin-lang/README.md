@@ -14,6 +14,11 @@ Currently none
 
 Initial release
 
+### 1.0.1
+
+- Fixed highlighting of import statement.
+- Added highlighting for user defined functions.
+
 ### 1.0.0
 
 Initial release of tin-lang vs code plugin
