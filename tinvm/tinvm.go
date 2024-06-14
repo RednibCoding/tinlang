@@ -3,6 +3,7 @@ package tinvm
 import (
 	"bufio"
 	"fmt"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -130,28 +131,44 @@ func (vm *TinVM) booleanFactor(active bool) bool {
 
 	switch e.typ {
 	case 'i':
-		b = e.value.(int) != 0 // Converting integer to boolean
+		b = e.value.(float64) != 0 // Converting integer to boolean
 		vm.nextChar()
 		if vm.takeString("==") {
-			b = (e.value.(int) == vm.mathExpression(active))
+			b = ((int)(e.value.(float64)) == (int)(vm.mathExpression(active)))
 		} else if vm.takeString("!=") {
-			b = (e.value.(int) != vm.mathExpression(active))
+			b = ((int)(e.value.(float64)) != (int)(vm.mathExpression(active)))
 		} else if vm.takeString("<=") {
-			b = (e.value.(int) <= vm.mathExpression(active))
+			b = ((int)(e.value.(float64)) <= (int)(vm.mathExpression(active)))
 		} else if vm.takeString("<") {
-			b = (e.value.(int) < vm.mathExpression(active))
+			b = ((int)(e.value.(float64)) < (int)(vm.mathExpression(active)))
 		} else if vm.takeString(">=") {
-			b = (e.value.(int) >= vm.mathExpression(active))
+			b = ((int)(e.value.(float64)) >= (int)(vm.mathExpression(active)))
 		} else if vm.takeString(">") {
-			b = (e.value.(int) > vm.mathExpression(active))
+			b = ((int)(e.value.(float64)) > (int)(vm.mathExpression(active)))
+		}
+	case 'f':
+		b = e.value.(float64) != 0.0
+		vm.nextChar()
+		if vm.takeString("==") {
+			b = (e.value.(float64) == vm.mathExpression(active))
+		} else if vm.takeString("!=") {
+			b = (e.value.(float64) != vm.mathExpression(active))
+		} else if vm.takeString("<=") {
+			b = (e.value.(float64) <= vm.mathExpression(active))
+		} else if vm.takeString("<") {
+			b = (e.value.(float64) < vm.mathExpression(active))
+		} else if vm.takeString(">=") {
+			b = (e.value.(float64) >= vm.mathExpression(active))
+		} else if vm.takeString(">") {
+			b = (e.value.(float64) > vm.mathExpression(active))
 		}
 	case 's':
 		b = e.value.(string) != ""
 		vm.nextChar()
 		if vm.takeString("==") {
-			b = (e.value.(string) == vm.stringExpression(active))
+			b = (e.value.(string) == vm.stringExpression())
 		} else if vm.takeString("!=") {
-			b = (e.value.(string) != vm.stringExpression(active))
+			b = (e.value.(string) != vm.stringExpression())
 		}
 	}
 
@@ -176,33 +193,34 @@ func (vm *TinVM) booleanExpression(active bool) bool {
 	return b
 }
 
-func (vm *TinVM) mathFactor(active bool) int {
-	m := 0
+func (vm *TinVM) mathFactor(active bool) float64 {
+	m := 0.0
 	if vm.takeNext('(') {
 		m = vm.mathExpression(active)
 		if !vm.takeNext(')') {
 			vm.error("missing ')'")
 		}
 	} else if isDigit(vm.nextChar()) {
-		for isDigit(vm.look()) {
-			m = 10*m + int(vm.take()-'0')
+		numStr := ""
+		for isDigit(vm.look()) || vm.look() == '.' {
+			numStr += string(vm.take())
 		}
-	} else if vm.takeString("val(") {
-		s := vm.string(active)
 		if active {
-			if v, err := strconv.Atoi(s); err == nil {
-				m = v
+			var err error
+			m, err = strconv.ParseFloat(numStr, 64)
+			if err != nil {
+				vm.error("invalid number format")
 			}
-		}
-		if !vm.takeNext(')') {
-			vm.error("missing ')'")
 		}
 	} else {
 		ident := vm.takeNextAlnum()
 		if val, ok := vm.variables[ident]; ok {
-			if value, valid := val.(int); valid {
+			switch value := val.(type) {
+			case int:
+				m = float64(value)
+			case float64:
 				m = value
-			} else {
+			default:
 				vm.error("unknown variable")
 			}
 		} else {
@@ -212,7 +230,7 @@ func (vm *TinVM) mathFactor(active bool) int {
 	return m
 }
 
-func (vm *TinVM) mathTerm(active bool) int {
+func (vm *TinVM) mathTerm(active bool) float64 {
 	m := vm.mathFactor(active)
 	for isMulOp(vm.nextChar()) {
 		c := vm.take()
@@ -226,7 +244,7 @@ func (vm *TinVM) mathTerm(active bool) int {
 	return m
 }
 
-func (vm *TinVM) mathExpression(active bool) int {
+func (vm *TinVM) mathExpression(active bool) float64 {
 	c := vm.nextChar() // Check for an optional leading sign
 	if isAddOp(c) {
 		c = vm.take()
@@ -247,7 +265,7 @@ func (vm *TinVM) mathExpression(active bool) int {
 	return m
 }
 
-func (vm *TinVM) string(active bool) string {
+func (vm *TinVM) parseString() string {
 	s := ""
 	if vm.takeNext('"') { // Literal string
 		for !vm.takeString("\"") {
@@ -260,36 +278,47 @@ func (vm *TinVM) string(active bool) string {
 				s += string(vm.take())
 			}
 		}
-	} else if vm.takeString("str(") { // str(...)
-		s = strconv.Itoa(vm.mathExpression(active))
-		if !vm.takeNext(')') {
-			vm.error("missing ')'")
-		}
-	} else if vm.takeString("input()") {
-		if active {
-			reader := bufio.NewReader(os.Stdin)
-			input, _ := reader.ReadString('\n')
-			s = strings.TrimSpace(input)
-		}
 	} else {
 		ident := vm.takeNextAlnum()
-		if val, ok := vm.variables[ident]; ok {
-			if value, valid := val.(string); valid {
-				s = value
+		if ident != "" {
+			if val, ok := vm.variables[ident]; ok {
+				switch value := val.(type) {
+				case string:
+					s = value
+				case int:
+					s = strconv.Itoa(value)
+				case float64:
+					s = strconv.FormatFloat(value, 'f', -1, 64)
+				default:
+					vm.error("unknown variable type")
+				}
 			} else {
-				vm.error("not a string")
+				vm.error("unknown variable")
 			}
 		} else {
-			vm.error("not a string")
+			// Handle direct numeric values
+			if isDigit(vm.nextChar()) || vm.nextChar() == '-' {
+				numStr := ""
+				for isDigit(vm.look()) || vm.look() == '.' || vm.look() == '-' {
+					numStr += string(vm.take())
+				}
+				if val, err := strconv.ParseFloat(numStr, 64); err == nil {
+					s = strconv.FormatFloat(val, 'f', -1, 64)
+				} else {
+					vm.error("invalid number format")
+				}
+			} else {
+				vm.error("expected string or number")
+			}
 		}
 	}
 	return s
 }
 
-func (vm *TinVM) stringExpression(active bool) string {
-	s := vm.string(active)
+func (vm *TinVM) stringExpression() string {
+	s := vm.parseString()
 	for vm.takeNext('+') {
-		s += vm.string(active) // String concatenation
+		s += vm.parseString() // String concatenation
 	}
 	return s
 }
@@ -306,15 +335,24 @@ func (vm *TinVM) expression(active bool) Expression {
 
 	nextChar := vm.nextChar()
 	if nextChar == '"' || ident == "str" || ident == "input" {
-		return Expression{'s', vm.stringExpression(active)}
+		return Expression{'s', vm.stringExpression()}
 	}
 
 	val, ok := vm.variables[ident]
 	if ok && val != nil && fmt.Sprintf("%T", val) == "string" {
-		return Expression{'s', vm.stringExpression(active)}
+		return Expression{'s', vm.stringExpression()}
 	}
 
-	return Expression{'i', vm.mathExpression(active)}
+	// Check for numeric expression
+	expr := vm.mathExpression(active)
+
+	// does it have decimal places?
+	if hasDecimalPlaces(expr) {
+		return Expression{'f', expr}
+	} else {
+		return Expression{'i', expr}
+	}
+
 }
 
 func (vm *TinVM) doWhile(active bool) {
@@ -512,4 +550,8 @@ func (vm *TinVM) collectArgs(active bool) []interface{} {
 		}
 	}
 	return args
+}
+
+func hasDecimalPlaces(f float64) bool {
+	return f != math.Floor(f)
 }
