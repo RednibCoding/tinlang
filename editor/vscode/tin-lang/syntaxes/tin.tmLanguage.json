@@ -1,10 +1,12 @@
 {
-	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
 	"fileTypes": ["tin"],
 	"name": "tin",
 	"patterns": [
 	  {
 		"include": "#comments"
+	  },
+	  {
+		"include": "#import"
 	  },
 	  {
 		"include": "#keywords"
@@ -17,6 +19,9 @@
 	  },
 	  {
 		"include": "#functions"
+	  },
+	  {
+		"include": "#userDefinedFunctions"
 	  }
 	],
 	"repository": {
@@ -25,6 +30,14 @@
 		  {
 			"name": "comment.line.semicolon.tin",
 			"match": ";.*$"
+		  }
+		]
+	  },
+	  "import": {
+		"patterns": [
+		  {
+			"name": "keyword.control.import.tin",
+			"match": "#import\\s+\\w+"
 		  }
 		]
 	  },
@@ -63,7 +76,15 @@
 		"patterns": [
 		  {
 			"name": "support.function.tin",
-			"match": "\\b(print)\\b"
+			"match": "\\b(print|demo|testReturn|printBye)\\b"
+		  }
+		]
+	  },
+	  "userDefinedFunctions": {
+		"patterns": [
+		  {
+			"name": "entity.name.function.tin",
+			"match": "\\bdef\\s+(\\w+)\\b"
 		  }
 		]
 	  }
