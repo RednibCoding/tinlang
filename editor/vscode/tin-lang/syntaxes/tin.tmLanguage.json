@@ -2,93 +2,81 @@
 	"fileTypes": ["tin"],
 	"name": "tin",
 	"patterns": [
-	  {
-		"include": "#comments"
-	  },
-	  {
-		"include": "#import"
-	  },
-	  {
-		"include": "#keywords"
-	  },
-	  {
-		"include": "#strings"
-	  },
-	  {
-		"include": "#numbers"
-	  },
-	  {
-		"include": "#functions"
-	  },
-	  {
-		"include": "#userDefinedFunctions"
-	  }
+		{
+			"include": "#comments"
+		},
+		{
+			"include": "#import"
+		},
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#strings"
+		},
+		{
+			"include": "#numbers"
+		},
+		{
+			"include": "#functions"
+		}
 	],
 	"repository": {
-	  "comments": {
-		"patterns": [
-		  {
-			"name": "comment.line.semicolon.tin",
-			"match": ";.*$"
-		  }
-		]
-	  },
-	  "import": {
-		"patterns": [
-		  {
-			"name": "keyword.control.import.tin",
-			"match": "#import\\s+\\w+"
-		  }
-		]
-	  },
-	  "keywords": {
-		"patterns": [
-		  {
-			"name": "keyword.control.tin",
-			"match": "\\b(if|else|while|break|return|def|call|import)\\b"
-		  }
-		]
-	  },
-	  "strings": {
-		"patterns": [
-		  {
-			"name": "string.quoted.double.tin",
-			"begin": "\"",
-			"end": "\"",
+		"comments": {
 			"patterns": [
-			  {
-				"name": "constant.character.escape.tin",
-				"match": "\\\\."
-			  }
+				{
+					"name": "comment.line.semicolon.tin",
+					"match": ";.*$"
+				}
 			]
-		  }
-		]
-	  },
-	  "numbers": {
-		"patterns": [
-		  {
-			"name": "constant.numeric.tin",
-			"match": "\\b[0-9]+(\\.[0-9]+)?\\b"
-		  }
-		]
-	  },
-	  "functions": {
-		"patterns": [
-		  {
-			"name": "support.function.tin",
-			"match": "\\b(print|println|wait)\\b"
-		  }
-		]
-	  },
-	  "userDefinedFunctions": {
-		"patterns": [
-		  {
-			"name": "entity.name.function.tin",
-			"match": "\\bdef\\s+(\\w+)\\b"
-		  }
-		]
-	  }
+		},
+		"import": {
+			"patterns": [
+				{
+					"name": "keyword.control.import.tin",
+					"match": "#import\\s+\\w+"
+				}
+			]
+		},
+		"keywords": {
+			"patterns": [
+				{
+					"name": "keyword.control.tin",
+					"match": "\\b(if|else|while|break|return|def|call|import)\\b"
+				}
+			]
+		},
+		"strings": {
+			"patterns": [
+				{
+					"name": "string.quoted.double.tin",
+					"begin": "\"",
+					"end": "\"",
+					"patterns": [
+						{
+							"name": "constant.character.escape.tin",
+							"match": "\\\\."
+						}
+					]
+				}
+			]
+		},
+		"numbers": {
+			"patterns": [
+				{
+					"name": "constant.numeric.tin",
+					"match": "\\b[0-9]+(\\.[0-9]+)?\\b"
+				}
+			]
+		},
+		"functions": {
+			"patterns": [
+				{
+					"name": "support.function.tin",
+					"match": "\\b(print|println|wait)\\b"
+				}
+			]
+		}
 	},
 	"scopeName": "source.tin"
-  }
-  
+}

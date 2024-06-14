@@ -1,9 +1,22 @@
 # Change Log
 
-All notable changes to the "tin-lang" extension will be documented in this file.
+### 1.0.4
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+- Removed highlighting for user defined functions because is did not work properly.
 
-## [Unreleased]
+### 1.0.3
 
-- Initial release
+- Added highlighting for function `wait`
+
+### 1.0.2
+
+- Added highlighting for function `println`
+
+### 1.0.1
+
+- Fixed highlighting of import statement.
+- Added highlighting for user defined functions.
+
+### 1.0.0
+
+Initial release of tin-lang vs code plugin

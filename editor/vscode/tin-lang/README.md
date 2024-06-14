@@ -14,6 +14,10 @@ Currently none
 
 Initial release
 
+### 1.0.4
+
+- Removed highlighting for user defined functions because is did not work properly.
+
 ### 1.0.3
 
 - Added highlighting for function `wait`
