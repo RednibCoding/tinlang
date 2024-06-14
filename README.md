@@ -4,20 +4,6 @@
 TinVM is a tiny interpreter for the custom scripting language "tin".
 Tin is basically one step above the BASIC language.
 
-## Building the Project
-
-To build the TinVM project, follow these steps:
-
-1. Ensure you have Go installed on your machine. You can download it from [https://golang.org/dl/](https://golang.org/dl/).
-2. Clone the TinVM repository or copy the `tinvm` folder into your project directory.
-3. Navigate to the project directory in your terminal.
-4. Run the following command from the root directoy of the project to build it:
-    ```
-    go build -ldflags="-s -w" -o tin.exe .
-    ```
-
-This will generate an executable named `tinvm`.
-
 ## Using the Language
 
 ### Writing Scripts
@@ -77,10 +63,14 @@ To run a script, use the following command:
 
 To embed TinVM in your own Go project, follow these steps:
 
-1. Copy the `tinvm` folder into your own project directory.
+1. Add `tinlang` to your project:
+    ```
+    go get github.com/RednibCoding/tinlang
+    ```
+
 2. Import TinVM in your Go code:
     ```go
-    import "yourproject/tinvm"
+    import "github.com/RednibCoding/tinlang"
     ```
 
 ### Example Usage
