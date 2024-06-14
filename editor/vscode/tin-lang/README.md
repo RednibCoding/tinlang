@@ -10,9 +10,9 @@ Provides syntax highlighting for the tin scripting language
 
 Currently none
 
-## Release Notes
+### 1.0.5
 
-Initial release
+- Added highlight for the keywords `and`, `or` and `not`
 
 ### 1.0.4
 

@@ -42,7 +42,7 @@
 			"patterns": [
 				{
 					"name": "keyword.control.tin",
-					"match": "\\b(if|else|while|break|return|def|call|import)\\b"
+					"match": "\\b(if|else|while|break|return|def|call|and|or|not)\\b"
 				}
 			]
 		},
@@ -76,7 +76,7 @@
 					"match": "\\b(print|println|wait)\\b"
 				}
 			]
-		}
+		}		
 	},
 	"scopeName": "source.tin"
 }

@@ -1,5 +1,9 @@
 # Change Log
 
+### 1.0.5
+
+- Added highlight for the keywords `and`, `or` and `not`
+
 ### 1.0.4
 
 - Removed highlighting for user defined functions because is did not work properly.
