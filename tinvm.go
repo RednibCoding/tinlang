@@ -601,8 +601,9 @@ func (vm *TinVM) collectArgs(active bool) ([]interface{}, int) {
 					panic("Type assertion to string failed in collectArgs")
 				}
 			case 'i':
-				if intVal, ok := e.value.(int); ok {
-					args = append(args, intVal)
+				// Internally, all numbers are treated as float64
+				if floatVal, ok := e.value.(float64); ok {
+					args = append(args, int(floatVal))
 				} else {
 					panic("Type assertion to int failed in collectArgs for int case")
 				}
