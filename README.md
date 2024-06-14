@@ -17,11 +17,10 @@ Tin scripts have the `.tin` extension. Here is a sample script (`test.tin`):
 ; so no namespacing or double import check
 ; in tin it is ideomatic to have a main.tin that import everything once
 #import bye
-
 def demo {
     a = "math expressions "
-    b = (10 + 1*2 + (4 + 5)*2 )*3 - val("111")
-    print "Test " + a + str(b), "\n"
+    b = (10 + 1*2 + (4 + 5)*2 )*3 - 111
+    print "Test " + a + b, "\n"
     if 0 or 5 > -2 or 0 print "True\n" else print "False\n"
     x=0 
     while x<20 {
@@ -45,7 +44,16 @@ def testReturn {
     print "after return \n"
 }
 
+
+
 print "Hello, World!\n"     ; program entry point
+
+pi = 3.14
+print pi , "\n"
+
+pi2 = pi * pi
+print pi2, "\n"
+
 call demo
 call testReturn
 call printBye
