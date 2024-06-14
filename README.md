@@ -151,6 +151,30 @@ func customPrintFunction(args []interface{}) error {
 }
 
 vm.AddFunction("print", customPrintFunction)
+
+```
+>**Note:** It is important to always check the number of arguments and their types, as you don't know what errors users might make in their scripts:
+```go
+
+func customFunction_Move(args []interface{}) error {
+    // Check the number of arguments (assuming 2 are expected here)
+	if len(args) != 2 {
+		return fmt.Errorf("move requires exactly 2 arguments")
+	}
+
+	// Using type assertions to check if x and y are of type int
+	x, ok1 := args[0].(int)
+	y, ok2 := args[1].(int)
+
+	if !ok1 || !ok2 {
+		return fmt.Errorf("both arguments must be of type int")
+	}
+
+	fmt.Printf("x: %d, y: %d\n", x, y)
+
+	Mover.Move(x, y)
+	return nil
+}
 ```
 
 ### Custom Variables
