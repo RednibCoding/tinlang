@@ -409,3 +409,9 @@ if "" {
 - **Syntax**: `wait <milliseconds>`
 - **Description**: Waits the given amout of milliseconds
 - **Example**: `wait 2000`
+
+## Editor Plugins
+In the `editor` directory you will find plugins for different editors. Currently for (help is welcome):
+ - [VS Code](https://code.visualstudio.com/)
+
+ The `readme.md` in each directory explains how to install them.
