@@ -12,7 +12,7 @@ Currently none
 
 ### 1.0.5
 
-- Added highlight for the keywords `and`, `or` and `not`
+- Added highlight for the keywords `and` and `or`
 
 ### 1.0.4
 

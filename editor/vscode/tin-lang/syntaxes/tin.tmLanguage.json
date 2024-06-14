@@ -42,7 +42,7 @@
 			"patterns": [
 				{
 					"name": "keyword.control.tin",
-					"match": "\\b(if|else|while|break|return|def|call|and|or|not)\\b"
+					"match": "\\b(if|else|while|break|return|def|call|and|or)\\b"
 				}
 			]
 		},

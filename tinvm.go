@@ -138,7 +138,7 @@ func (vm *TinVM) takeNextAlnum() string {
 }
 
 func (vm *TinVM) booleanFactor(active bool) bool {
-	inv := vm.takeString("not")
+	inv := vm.takeNext('!')
 	e := vm.expression(active)
 	var b bool
 
