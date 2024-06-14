@@ -30,18 +30,29 @@ func New() *TinVM {
 	return vm
 }
 
-func (vm *TinVM) Run(source string) {
-	preprocessedSource, err := vm.preprocess(source + "\000")
+func (vm *TinVM) Run(source string, filename string) {
+	// Preprocess the source code to handle imports
+	preprocessedSource, err := vm.preprocess(string(source)+"\000", filename)
 	if err != nil {
 		fmt.Println(err.Error())
-		os.Exit(0)
+		os.Exit(1)
 	}
 
-	vm.source = preprocessedSource
+	// Add initial filename directive
+	vm.source = fmt.Sprintf("#%s:%d\n%s", filename, 1, preprocessedSource)
 
 	active := true
+
 	for vm.nextChar() != '\000' {
-		vm.block(active)
+		if vm.source[vm.pc] == '#' {
+			vm.pc++
+			for vm.source[vm.pc] != '\n' && vm.source[vm.pc] != '\000' {
+				vm.pc++
+			}
+			vm.pc++ // Move past the newline
+		} else {
+			vm.block(active)
+		}
 	}
 }
 
@@ -476,10 +487,11 @@ func (vm *TinVM) block(active bool) {
 	}
 }
 
-// Preprocess the script to handle imports
-func (vm *TinVM) preprocess(source string) (string, error) {
+// Preprocess the script to handle imports and preserve import directives with line numbers
+func (vm *TinVM) preprocess(source string, filename string) (string, error) {
 	var result strings.Builder
 	scanner := bufio.NewScanner(strings.NewReader(source))
+	lineNumber := 1
 
 	for scanner.Scan() {
 		lineRaw := scanner.Text()
@@ -495,11 +507,18 @@ func (vm *TinVM) preprocess(source string) (string, error) {
 				return "", fmt.Errorf("error reading file %s: %v", importPath, err)
 			}
 
-			// Append the content of the imported file to the result
-			result.WriteString(string(content) + "\n")
+			// Append the import directive and the content of the imported file to the result
+			result.WriteString(fmt.Sprintf("#%s:%d\n", importPath, 1))
+			importedContent, err := vm.preprocess(string(content), importPath)
+			if err != nil {
+				return "", err
+			}
+			result.WriteString(importedContent)
+			result.WriteString(fmt.Sprintf("#%s:%d\n", filename, lineNumber+1))
 		} else {
-			result.WriteString(line + "\n")
+			result.WriteString(lineRaw + "\n")
 		}
+		lineNumber++
 	}
 
 	if err := scanner.Err(); err != nil {
@@ -510,14 +529,40 @@ func (vm *TinVM) preprocess(source string) (string, error) {
 }
 
 func (vm *TinVM) error(text string) {
-	s := strings.LastIndex(vm.source[:vm.pc], "\n") + 1
-	e := strings.Index(vm.source[vm.pc:], "\n")
-	if e == -1 {
-		e = len(vm.source)
-	} else {
-		e += vm.pc
+	// Find the current file and line number
+	currentFile := "unknown"
+	currentLine := 1
+
+	for i := vm.pc; i >= 0; i-- {
+		if vm.source[i] == '#' {
+			startDirective := i + 1
+			endDirective := strings.Index(vm.source[startDirective:], "\n")
+			if endDirective == -1 {
+				endDirective = len(vm.source)
+			} else {
+				endDirective += startDirective
+			}
+			directive := strings.TrimSpace(vm.source[startDirective:endDirective])
+			parts := strings.Split(directive, ":")
+			if len(parts) == 2 {
+				currentFile = parts[0]
+				lineNumber, _ := strconv.Atoi(parts[1])
+				linesBeforeError := strings.Count(vm.source[i:vm.pc], "\n") - 1
+				currentLine = lineNumber + linesBeforeError
+				break
+			}
+		}
 	}
-	fmt.Printf("\nERROR %s in line %d: '%s_%s'\n", text, strings.Count(vm.source[:vm.pc], "\n")+1, vm.source[s:vm.pc], vm.source[vm.pc:e])
+
+	start := strings.LastIndex(vm.source[:vm.pc], "\n") + 1
+	end := strings.Index(vm.source[vm.pc:], "\n")
+	if end == -1 {
+		end = len(vm.source)
+	} else {
+		end += vm.pc
+	}
+
+	fmt.Printf("\nERROR %s in '%s' on line %d: '%s_%s'\n", text, currentFile, currentLine, vm.source[start:vm.pc], vm.source[vm.pc:end])
 	os.Exit(1)
 }
 

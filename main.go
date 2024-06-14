@@ -7,8 +7,8 @@ import (
 )
 
 func main() {
-	// args := []string{"tin.exe", "test.tin"}
-	args := os.Args
+	args := []string{"tin.exe", "test.tin"}
+	// args := os.Args
 	if len(args) < 2 {
 		fmt.Println("USAGE: tin <sourcefile>")
 		os.Exit(1)
@@ -20,5 +20,5 @@ func main() {
 	}
 
 	vm := tinvm.New()
-	vm.Run(string(source))
+	vm.Run(string(source), args[1])
 }
