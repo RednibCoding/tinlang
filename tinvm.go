@@ -25,7 +25,8 @@ func New() *TinVM {
 		returnFlag:  false,
 	}
 
-	vm.AddFunction("print", customPrintFunction)
+	vm.AddFunction("print", customFunc_Print)
+	vm.AddFunction("println", customFunc_Println)
 
 	return vm
 }
