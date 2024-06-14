@@ -10,7 +10,7 @@ import (
 //	Custom Functions
 //
 // #################################################################
-func customFunc_Print(args []interface{}) error {
+func customFunc_Print(vm *TinVM, args []interface{}) error {
 	for _, arg := range args {
 		switch v := arg.(type) {
 		case string:
@@ -26,7 +26,7 @@ func customFunc_Print(args []interface{}) error {
 	return nil
 }
 
-func customFunc_Println(args []interface{}) error {
+func customFunc_Println(vm *TinVM, args []interface{}) error {
 	for _, arg := range args {
 		switch v := arg.(type) {
 		case string:
@@ -42,7 +42,7 @@ func customFunc_Println(args []interface{}) error {
 	return nil
 }
 
-func customFunction_Wait(args []interface{}) error {
+func customFunction_Wait(vm *TinVM, args []interface{}) error {
 	if len(args) != 1 {
 		return fmt.Errorf("wait requires exactly 1 argument")
 	}

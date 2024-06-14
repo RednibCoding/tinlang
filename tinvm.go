@@ -13,7 +13,7 @@ type TinVM struct {
 	source      string
 	pc          int
 	variables   map[string]interface{}
-	customFuncs map[string]func([]interface{}) error
+	customFuncs map[string]func(*TinVM, []interface{}) error
 	returnFlag  bool
 }
 
@@ -21,7 +21,7 @@ func New() *TinVM {
 	vm := &TinVM{
 		pc:          0,
 		variables:   make(map[string]interface{}),
-		customFuncs: make(map[string]func([]interface{}) error),
+		customFuncs: make(map[string]func(*TinVM, []interface{}) error),
 		returnFlag:  false,
 	}
 
@@ -58,7 +58,7 @@ func (vm *TinVM) Run(source string, filename string) {
 	}
 }
 
-func (vm *TinVM) AddFunction(name string, fn func([]interface{}) error) {
+func (vm *TinVM) AddFunction(name string, fn func(*TinVM, []interface{}) error) {
 	vm.customFuncs[name] = fn
 }
 
@@ -577,7 +577,7 @@ func (vm *TinVM) handleCustomFunction(ident string, active bool) bool {
 		// Collect arguments for the custom function without parentheses
 		args, startPc := vm.collectArgs(active)
 		if active {
-			err := fn(args)
+			err := fn(vm, args)
 			if err != nil {
 				vm.errorWithPosition(fmt.Sprintf("error in function '%s': %v", ident, err), startPc)
 			}
