@@ -1,0 +1,26 @@
+{
+  "repository": "https://github.com/RednibCoding/tinvm",
+  "name": "tin-lang",
+  "displayName": "tin-lang",
+  "description": "Syntax highlighting for the tin scripting language",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "tin",
+      "aliases": ["tin", "tin"],
+      "extensions": [".tin"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "tin",
+      "scopeName": "source.tin",
+      "path": "./syntaxes/tin.tmLanguage.json"
+    }]
+  }
+}

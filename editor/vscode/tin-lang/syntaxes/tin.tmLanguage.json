@@ -1,0 +1,73 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"fileTypes": ["tin"],
+	"name": "tin",
+	"patterns": [
+	  {
+		"include": "#comments"
+	  },
+	  {
+		"include": "#keywords"
+	  },
+	  {
+		"include": "#strings"
+	  },
+	  {
+		"include": "#numbers"
+	  },
+	  {
+		"include": "#functions"
+	  }
+	],
+	"repository": {
+	  "comments": {
+		"patterns": [
+		  {
+			"name": "comment.line.semicolon.tin",
+			"match": ";.*$"
+		  }
+		]
+	  },
+	  "keywords": {
+		"patterns": [
+		  {
+			"name": "keyword.control.tin",
+			"match": "\\b(if|else|while|break|return|def|call|import)\\b"
+		  }
+		]
+	  },
+	  "strings": {
+		"patterns": [
+		  {
+			"name": "string.quoted.double.tin",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+			  {
+				"name": "constant.character.escape.tin",
+				"match": "\\\\."
+			  }
+			]
+		  }
+		]
+	  },
+	  "numbers": {
+		"patterns": [
+		  {
+			"name": "constant.numeric.tin",
+			"match": "\\b[0-9]+(\\.[0-9]+)?\\b"
+		  }
+		]
+	  },
+	  "functions": {
+		"patterns": [
+		  {
+			"name": "support.function.tin",
+			"match": "\\b(print)\\b"
+		  }
+		]
+	  }
+	},
+	"scopeName": "source.tin"
+  }
+  
