@@ -179,7 +179,7 @@ func customFunction_Move(vm *tinvm.TinVM, args []interface{}) error {
 
 ### Custom Variables
 
-Custom variables can be defined and added to the VM using the `AddVariable` method. Variables can be of any type.
+Custom variables can be defined and added to the VM using the `AddVariable` method. Variables can be of type `string`, `int` or `float64`.
 
 Example:
 
