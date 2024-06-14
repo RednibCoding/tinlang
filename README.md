@@ -348,7 +348,7 @@ while x < 5 {
 
 ### Numbers
 
-Numbers in Tin can be integers or floating-point values. They are used in mathematical expressions and comparisons.
+Numbers in Tin can be of type `int` or `float64`. They are used in mathematical expressions and comparisons.
 
 Example:
 
@@ -392,3 +392,20 @@ if "" {
     print "Empty string is falsy\n"
 }
 ```
+
+## Builtin Functions
+
+### print
+- **Syntax**: `print <arg1>, <arg2>, ...`
+- **Description**: Prints the given arguments to the standard out
+- **Example**: `print: "Hello, World times ", 10, \n"`
+
+### println
+- **Syntax**: `println <arg1>, <arg2>, ...`
+- **Description**: Prints the given arguments to the standard out and adds a newline character at the end
+- **Example**: `print: "Hello, World times ", 10"`
+
+### wait
+- **Syntax**: `print <milliseconds>`
+- **Description**: Waits the given amout of milliseconds
+- **Example**: `wait 2000`
