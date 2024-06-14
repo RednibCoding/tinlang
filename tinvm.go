@@ -587,14 +587,26 @@ func (vm *TinVM) collectArgs(active bool) []interface{} {
 	for vm.nextChar() != '\n' && vm.nextChar() != '\000' {
 		e := vm.expression(active)
 		if active {
-			// check type and append the correct type (string, int or float64)
+			// Check type and append the correct type (string, int, or float64)
 			switch e.typ {
 			case 's':
-				args = append(args, e.value.(string))
+				if strVal, ok := e.value.(string); ok {
+					args = append(args, strVal)
+				} else {
+					panic("Type assertion to string failed in collectArgs")
+				}
 			case 'i':
-				args = append(args, e.value.(int))
+				if floatVal, ok := e.value.(float64); ok {
+					args = append(args, int(floatVal)) // Convert float64 to int
+				} else {
+					panic("Type assertion to float64 failed in collectArgs for int case")
+				}
 			case 'f':
-				args = append(args, e.value.(float64))
+				if floatVal, ok := e.value.(float64); ok {
+					args = append(args, floatVal)
+				} else {
+					panic("Type assertion to float64 failed in collectArgs for float case")
+				}
 			default:
 				panic("Unknown type in collectArgs: this should never happen!")
 			}
