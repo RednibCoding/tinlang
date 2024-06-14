@@ -30,15 +30,16 @@ func customFunc_Println(vm *TinVM, args []interface{}) error {
 	for _, arg := range args {
 		switch v := arg.(type) {
 		case string:
-			fmt.Println(v)
+			fmt.Print(v)
 		case int:
-			fmt.Println(v)
+			fmt.Print(v)
 		case float64:
-			fmt.Println(v)
+			fmt.Print(v)
 		default:
 			return fmt.Errorf("unsupported argument type")
 		}
 	}
+	fmt.Println()
 	return nil
 }
 
