@@ -116,7 +116,7 @@ func main() {
 	}
 
 	vm := tinvm.New()
-	vm.Run(string(source))
+	vm.Run(string(source), args[1])
 }
 ```
 
