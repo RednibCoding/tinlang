@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
-	"github.com/RednibCoding/tinlang"
+
+	"github.com/RednibCoding/tinvm"
 )
 
 func main() {
