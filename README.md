@@ -63,14 +63,14 @@ To run a script, use the following command:
 
 To embed TinVM in your own Go project, follow these steps:
 
-1. Add `tinlang` to your project:
+1. Add `tinvm` to your project:
     ```
-    go get github.com/RednibCoding/tinlang
+    go get github.com/RednibCoding/tinvm
     ```
 
 2. Import TinVM in your Go code:
     ```go
-    import "github.com/RednibCoding/tinlang"
+    import "github.com/RednibCoding/tinvm"
     ```
 
 ### Example Usage
@@ -83,7 +83,7 @@ package main
 import (
 	"fmt"
 	"os"
-	"yourprojectname/tinvm"
+	"github.com/RednibCoding/tinvm"
 )
 
 func main() {
