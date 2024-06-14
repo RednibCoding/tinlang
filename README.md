@@ -2,7 +2,10 @@
 # TinVM: A Tiny Scripting Language
 
 TinVM is a tiny interpreter for the custom scripting language "tin".
+
 Tin is basically one step above the BASIC language.
+
+Tin is written in pure Go ~600 loc.
 
 ## Using the Language
 
