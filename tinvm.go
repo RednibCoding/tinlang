@@ -530,11 +530,15 @@ func (vm *TinVM) preprocess(source string, filename string) (string, error) {
 }
 
 func (vm *TinVM) error(text string) {
+	vm.errorWithPosition(text, vm.pc)
+}
+
+func (vm *TinVM) errorWithPosition(text string, pc int) {
 	// Find the current file and line number
 	currentFile := "unknown"
 	currentLine := 1
 
-	for i := vm.pc; i >= 0; i-- {
+	for i := pc; i >= 0; i-- {
 		if vm.source[i] == '#' {
 			startDirective := i + 1
 			endDirective := strings.Index(vm.source[startDirective:], "\n")
@@ -548,33 +552,33 @@ func (vm *TinVM) error(text string) {
 			if len(parts) == 2 {
 				currentFile = parts[0]
 				lineNumber, _ := strconv.Atoi(parts[1])
-				linesBeforeError := strings.Count(vm.source[i:vm.pc], "\n") - 1
+				linesBeforeError := strings.Count(vm.source[i:pc], "\n") - 1
 				currentLine = lineNumber + linesBeforeError
 				break
 			}
 		}
 	}
 
-	start := strings.LastIndex(vm.source[:vm.pc], "\n") + 1
-	end := strings.Index(vm.source[vm.pc:], "\n")
+	start := strings.LastIndex(vm.source[:pc], "\n") + 1
+	end := strings.Index(vm.source[pc:], "\n")
 	if end == -1 {
 		end = len(vm.source)
 	} else {
-		end += vm.pc
+		end += pc
 	}
 
-	fmt.Printf("\nERROR %s in '%s' on line %d: '%s_%s'\n", text, currentFile, currentLine, vm.source[start:vm.pc], vm.source[vm.pc:end])
+	fmt.Printf("\nERROR %s in '%s' on line %d: '%s_%s'\n", text, currentFile, currentLine, vm.source[start:pc], vm.source[pc:end])
 	os.Exit(1)
 }
 
 func (vm *TinVM) handleCustomFunction(ident string, active bool) bool {
 	if fn, ok := vm.customFuncs[ident]; ok {
 		// Collect arguments for the custom function without parentheses
-		args := vm.collectArgs(active)
+		args, startPc := vm.collectArgs(active)
 		if active {
 			err := fn(args)
 			if err != nil {
-				vm.error(fmt.Sprintf("error in function '%s': %v", ident, err))
+				vm.errorWithPosition(fmt.Sprintf("error in function '%s': %v", ident, err), startPc)
 			}
 		}
 		return true
@@ -582,12 +586,13 @@ func (vm *TinVM) handleCustomFunction(ident string, active bool) bool {
 	return false
 }
 
-func (vm *TinVM) collectArgs(active bool) []interface{} {
+func (vm *TinVM) collectArgs(active bool) ([]interface{}, int) {
 	var args []interface{}
+	startPc := vm.pc
+
 	for vm.nextChar() != '\n' && vm.nextChar() != '\000' {
 		e := vm.expression(active)
 		if active {
-			// Check type and append the correct type (string, int, or float64)
 			switch e.typ {
 			case 's':
 				if strVal, ok := e.value.(string); ok {
@@ -596,10 +601,10 @@ func (vm *TinVM) collectArgs(active bool) []interface{} {
 					panic("Type assertion to string failed in collectArgs")
 				}
 			case 'i':
-				if floatVal, ok := e.value.(float64); ok {
-					args = append(args, int(floatVal)) // Convert float64 to int
+				if intVal, ok := e.value.(int); ok {
+					args = append(args, intVal)
 				} else {
-					panic("Type assertion to float64 failed in collectArgs for int case")
+					panic("Type assertion to int failed in collectArgs for int case")
 				}
 			case 'f':
 				if floatVal, ok := e.value.(float64); ok {
@@ -617,7 +622,7 @@ func (vm *TinVM) collectArgs(active bool) []interface{} {
 			break
 		}
 	}
-	return args
+	return args, startPc
 }
 
 func hasDecimalPlaces(f float64) bool {
