@@ -3,7 +3,7 @@
   "name": "tin-lang",
   "displayName": "tin-lang",
   "description": "Syntax highlighting for the tin scripting language",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "engines": {
     "vscode": "^1.90.0"
   },
