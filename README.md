@@ -127,13 +127,13 @@ func main() {
 Custom functions can be defined and added to the VM using the `AddFunction` method. Custom functions must have the following signature:
 
 ```go
-func(args []interface{}) error
+func(vm *TinVM, args []interface{}) error
 ```
 
 Example:
 
 ```go
-func customPrintFunction(args []interface{}) error {
+func customPrintFunction(vm *tinvm.TinVM, args []interface{}) error {
     for _, arg := range args {
         switch v := arg.(type) {
         case string:
@@ -156,7 +156,7 @@ vm.AddFunction("print", customPrintFunction)
 >**Note:** It is important to always check the number of arguments and their types, as you don't know what errors users might make in their scripts:
 ```go
 
-func customFunction_Move(args []interface{}) error {
+func customFunction_Move(vm *tinvm.TinVM, args []interface{}) error {
     // Check the number of arguments (assuming 2 are expected here)
 	if len(args) != 2 {
 		return fmt.Errorf("move requires exactly 2 arguments")
