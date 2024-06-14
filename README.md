@@ -7,6 +7,12 @@ Tin is basically one step above the BASIC language.
 
 Tin is written in pure Go ~600 loc.
 
+Tin is:
+- tiny
+- easy
+- embeddable
+- extendable via custom functions and variables
+
 ## Using the Language
 
 ### Writing Scripts
