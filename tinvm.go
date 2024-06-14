@@ -227,17 +227,19 @@ func (vm *TinVM) mathFactor(active bool) float64 {
 		}
 	} else {
 		ident := vm.takeNextAlnum()
-		if val, ok := vm.variables[ident]; ok {
-			switch value := val.(type) {
-			case int:
-				m = float64(value)
-			case float64:
-				m = value
-			default:
+		if active {
+			if val, ok := vm.variables[ident]; ok {
+				switch value := val.(type) {
+				case int:
+					m = float64(value)
+				case float64:
+					m = value
+				default:
+					vm.error("unknown variable")
+				}
+			} else {
 				vm.error("unknown variable")
 			}
-		} else {
-			vm.error("unknown variable")
 		}
 	}
 	return m

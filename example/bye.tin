@@ -1,5 +1,0 @@
-print "Hello from bye.tin\n"
-
-def printBye {
-    print "Bye\n"
-}
