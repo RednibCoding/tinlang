@@ -14,6 +14,14 @@ Currently none
 
 Initial release
 
+### 1.0.3
+
+- Added highlighting for function `wait`
+
+### 1.0.2
+
+- Added highlighting for function `println`
+
 ### 1.0.1
 
 - Fixed highlighting of import statement.

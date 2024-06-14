@@ -1,6 +1,9 @@
 package tinvm
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 // #################################################################
 //
@@ -36,5 +39,22 @@ func customFunc_Println(args []interface{}) error {
 			return fmt.Errorf("unsupported argument type")
 		}
 	}
+	return nil
+}
+
+func customFunction_Wait(args []interface{}) error {
+	if len(args) != 1 {
+		return fmt.Errorf("wait requires exactly 1 argument")
+	}
+
+	// Using type assertions to check if x and y are of type int
+	ms, ok := args[0].(int)
+
+	if !ok {
+		return fmt.Errorf("argument must be of type int, got: %T", ms)
+	}
+
+	time.Sleep(time.Duration(ms) * time.Millisecond)
+
 	return nil
 }
