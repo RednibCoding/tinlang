@@ -28,6 +28,7 @@ func New() *TinVM {
 	vm.AddFunction("print", customFunc_Print)
 	vm.AddFunction("println", customFunc_Println)
 	vm.AddFunction("wait", customFunction_Wait)
+	vm.AddFunction("exit", customFunction_Exit)
 
 	return vm
 }
@@ -45,7 +46,7 @@ func (vm *TinVM) Run(source string, filename string) {
 
 	active := true
 
-	for vm.nextChar() != '\000' {
+	for vm.nextNoneWhiteChar() != '\000' {
 		if vm.source[vm.pc] == '#' {
 			vm.pc++
 			for vm.source[vm.pc] != '\n' && vm.source[vm.pc] != '\000' {
@@ -92,7 +93,14 @@ func (vm *TinVM) takeString(word string) bool {
 	return true
 }
 
-func (vm *TinVM) nextChar() byte {
+func (vm *TinVM) nextNoneWhiteCharKeepNewline() byte {
+	for vm.look() == ' ' || vm.look() == '\t' || vm.look() == '\r' {
+		vm.take()
+	}
+	return vm.look()
+}
+
+func (vm *TinVM) nextNoneWhiteChar() byte {
 	for vm.look() == ' ' || vm.look() == '\t' || vm.look() == '\n' || vm.look() == '\r' {
 		vm.take()
 	}
@@ -100,7 +108,7 @@ func (vm *TinVM) nextChar() byte {
 }
 
 func (vm *TinVM) takeNext(char byte) bool {
-	if vm.nextChar() == char {
+	if vm.nextNoneWhiteChar() == char {
 		vm.take()
 		return true
 	}
@@ -129,7 +137,7 @@ func isMulOp(c byte) bool {
 
 func (vm *TinVM) takeNextAlnum() string {
 	alnum := ""
-	if isAlpha(vm.nextChar()) {
+	if isAlpha(vm.nextNoneWhiteChar()) {
 		for isAlnum(vm.look()) {
 			alnum += string(vm.take())
 		}
@@ -145,7 +153,7 @@ func (vm *TinVM) booleanFactor(active bool) bool {
 	switch e.typ {
 	case 'i':
 		b = e.value.(float64) != 0 // Converting integer to boolean
-		vm.nextChar()
+		vm.nextNoneWhiteChar()
 		if vm.takeString("==") {
 			b = ((int)(e.value.(float64)) == (int)(vm.mathExpression(active)))
 		} else if vm.takeString("!=") {
@@ -161,7 +169,7 @@ func (vm *TinVM) booleanFactor(active bool) bool {
 		}
 	case 'f':
 		b = e.value.(float64) != 0.0
-		vm.nextChar()
+		vm.nextNoneWhiteChar()
 		if vm.takeString("==") {
 			b = (e.value.(float64) == vm.mathExpression(active))
 		} else if vm.takeString("!=") {
@@ -177,7 +185,7 @@ func (vm *TinVM) booleanFactor(active bool) bool {
 		}
 	case 's':
 		b = e.value.(string) != ""
-		vm.nextChar()
+		vm.nextNoneWhiteChar()
 		if vm.takeString("==") {
 			b = (e.value.(string) == vm.stringExpression())
 		} else if vm.takeString("!=") {
@@ -213,7 +221,7 @@ func (vm *TinVM) mathFactor(active bool) float64 {
 		if !vm.takeNext(')') {
 			vm.error("missing ')'")
 		}
-	} else if isDigit(vm.nextChar()) {
+	} else if isDigit(vm.nextNoneWhiteChar()) {
 		numStr := ""
 		for isDigit(vm.look()) || vm.look() == '.' {
 			numStr += string(vm.take())
@@ -247,7 +255,7 @@ func (vm *TinVM) mathFactor(active bool) float64 {
 
 func (vm *TinVM) mathTerm(active bool) float64 {
 	m := vm.mathFactor(active)
-	for isMulOp(vm.nextChar()) {
+	for isMulOp(vm.nextNoneWhiteChar()) {
 		c := vm.take()
 		m2 := vm.mathFactor(active)
 		if c == '*' {
@@ -260,7 +268,7 @@ func (vm *TinVM) mathTerm(active bool) float64 {
 }
 
 func (vm *TinVM) mathExpression(active bool) float64 {
-	c := vm.nextChar() // Check for an optional leading sign
+	c := vm.nextNoneWhiteChar() // Check for an optional leading sign
 	if isAddOp(c) {
 		c = vm.take()
 	}
@@ -268,7 +276,7 @@ func (vm *TinVM) mathExpression(active bool) float64 {
 	if c == '-' {
 		m = -m
 	}
-	for isAddOp(vm.nextChar()) {
+	for isAddOp(vm.nextNoneWhiteChar()) {
 		c = vm.take()
 		m2 := vm.mathTerm(active)
 		if c == '+' {
@@ -312,7 +320,7 @@ func (vm *TinVM) parseString() string {
 			}
 		} else {
 			// Handle direct numeric values
-			if isDigit(vm.nextChar()) || vm.nextChar() == '-' {
+			if isDigit(vm.nextNoneWhiteChar()) || vm.nextNoneWhiteChar() == '-' {
 				numStr := ""
 				for isDigit(vm.look()) || vm.look() == '.' || vm.look() == '-' {
 					numStr += string(vm.take())
@@ -348,7 +356,7 @@ func (vm *TinVM) expression(active bool) Expression {
 	ident := vm.takeNextAlnum()
 	vm.pc = originalPc // Scan for identifier or "str"
 
-	nextChar := vm.nextChar()
+	nextChar := vm.nextNoneWhiteChar()
 	if nextChar == '"' || ident == "str" || ident == "input" {
 		return Expression{'s', vm.stringExpression()}
 	}
@@ -390,7 +398,7 @@ func (vm *TinVM) doIfElse(active bool) {
 	} else {
 		vm.block(false)
 	}
-	vm.nextChar()
+	vm.nextNoneWhiteChar()
 	if vm.takeString("else") { // Process else block
 		if active && !b {
 			vm.block(active)
@@ -593,7 +601,7 @@ func (vm *TinVM) collectArgs(active bool) ([]interface{}, int) {
 	var args []interface{}
 	startPc := vm.pc
 
-	for vm.nextChar() != '\n' && vm.nextChar() != '\000' {
+	for vm.nextNoneWhiteCharKeepNewline() != '\n' && vm.nextNoneWhiteCharKeepNewline() != '\000' {
 		e := vm.expression(active)
 		if active {
 			switch e.typ {
@@ -620,7 +628,7 @@ func (vm *TinVM) collectArgs(active bool) ([]interface{}, int) {
 				panic("Unknown type in collectArgs: this should never happen!")
 			}
 		}
-		if vm.nextChar() == ',' {
+		if vm.nextNoneWhiteChar() == ',' {
 			vm.take()
 		} else {
 			break

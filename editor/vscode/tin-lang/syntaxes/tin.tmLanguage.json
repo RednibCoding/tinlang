@@ -73,7 +73,7 @@
 			"patterns": [
 				{
 					"name": "support.function.tin",
-					"match": "\\b(print|println|wait)\\b"
+					"match": "\\b(print|println|wait|exit)\\b"
 				}
 			]
 		}		

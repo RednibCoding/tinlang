@@ -1,5 +1,9 @@
 # Change Log
 
+### 1.0.6
+
+- Added highlight for the keywords `exit`
+
 ### 1.0.5
 
 - Added highlight for the keywords `and` and `or`

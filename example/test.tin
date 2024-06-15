@@ -1,7 +1,9 @@
 
 def demo {
-    testfunc "varname"
-    println varname
+    println "Demo"
 }
+
+println "Exiting"
+exit 
 
 call demo

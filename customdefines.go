@@ -2,6 +2,7 @@ package tinvm
 
 import (
 	"fmt"
+	"os"
 	"time"
 )
 
@@ -57,5 +58,13 @@ func customFunction_Wait(vm *TinVM, args []interface{}) error {
 
 	time.Sleep(time.Duration(ms) * time.Millisecond)
 
+	return nil
+}
+
+func customFunction_Exit(vm *TinVM, args []interface{}) error {
+	if len(args) != 0 {
+		return fmt.Errorf("exit requires no arguments")
+	}
+	os.Exit(0)
 	return nil
 }

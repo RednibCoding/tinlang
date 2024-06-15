@@ -6,9 +6,11 @@ Syntax highlighting for the [tin](https://github.com/RednibCoding/tinvm) scripti
 
 Provides syntax highlighting for the tin scripting language
 
-## Known Issues
+## Changelog
 
-Currently none
+### 1.0.6
+
+- Added highlight for the keywords `exit`
 
 ### 1.0.5
 
